@@ -37,6 +37,11 @@ namespace SocketLeakDetection
         {
             return (e1.CurrentAvg - e2.CurrentAvg) / (e1.CurrentAvg);
         }
+
+        public static EMWA operator +(EMWA e1, int next)
+        {
+            return e1.Next(next);
+        }
     }
 
     public class SocketLeakDetectorActor: UntypedActor
