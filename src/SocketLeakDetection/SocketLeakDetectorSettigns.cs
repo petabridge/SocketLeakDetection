@@ -33,28 +33,28 @@ namespace SocketLeakDetection
         {
             if (maxConnections > 0)
                 MaxConnections = maxConnections;
-            else 
-                MaxConnections = 16777214;
+            else
+                throw new ArgumentOutOfRangeException(nameof(maxConnections), "maxConnections must be greater than 0");
 
             if (maxDifference > 0)
                 MaxDifference = maxDifference;
             else
-                MaxDifference = 0.25;
+                throw new ArgumentOutOfRangeException(nameof(maxDifference), "maxDifference must be greater than 0");
 
             if (percentDifference > 0)
                 PercenDifference = percentDifference;
             else
-                PercenDifference = 0.2;
+                throw new ArgumentOutOfRangeException(nameof(percentDifference), "percentDifference must be greater than 0");
 
             if (largeSampleSize > 2)
                 LargeSampleSize = largeSampleSize;
             else
-                LargeSampleSize = 2;
+                throw new ArgumentOutOfRangeException(nameof(largeSampleSize), "LargeSampleSize must be at least 2");
 
             if (smallSampleSize < LargeSampleSize)
                 SmallSampleSize = smallSampleSize;
             else
-                SmallSampleSize = 1;
+                throw new ArgumentOutOfRangeException(nameof(smallSampleSize), "smallSampleSize must greater than largeSampleSize");
 
             Rate = rate;
             
