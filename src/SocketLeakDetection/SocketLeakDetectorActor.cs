@@ -44,6 +44,105 @@ namespace SocketLeakDetection
         }
     }
 
+    /// <summary>
+    /// The leak detection business logic.
+    /// </summary>
+    public sealed class LeakDetector
+    {
+        public const int DefaultShortSampleSize = 10;
+        public const int DefaultLongSampleSize = 30;
+        private bool _minThresholdBreached = false;
+
+        public LeakDetector(SocketLeakDetectorSettings settings)
+            : this(settings.MinConnections, settings.MaxDifference, 
+                settings.MaxConnections, settings.ShortSampleSize, settings.LongSampleSize) { }
+
+        public LeakDetector(int minConnectionCount, double maxDifference, int maxConnectionCount, 
+            int shortSampleSize = DefaultShortSampleSize, int longSampleSize = DefaultLongSampleSize)
+        {
+            MinConnectionCount = minConnectionCount;
+            if(MinConnectionCount < 1)
+                throw new ArgumentOutOfRangeException(nameof(minConnectionCount), "MinConnectionCount must be at least 1");
+           
+            MaxDifference = maxDifference;
+            if(MaxDifference <= 0.0d)
+                throw new ArgumentOutOfRangeException(nameof(maxDifference), "MaxDifference must be greater than 0.0");
+
+            MaxConnectionCount = maxConnectionCount;
+            if (MaxConnectionCount <= MinConnectionCount)
+                throw new ArgumentOutOfRangeException(nameof(maxConnectionCount), "MaxConnectionCount must be greater than MinConnectionCount");
+
+            // default both EMWAs to the minimum connection count.
+            Short = EMWA.Init(shortSampleSize, minConnectionCount);
+            Long = EMWA.Init(longSampleSize, minConnectionCount);
+        }
+
+        /// <summary>
+        /// Moving average - long
+        /// </summary>
+        public EMWA Long { get; private set; }
+
+        /// <summary>
+        /// Moving average - short
+        /// </summary>
+        public EMWA Short { get; private set; }
+
+        public double RelativeDifference => Short % Long;
+
+        public double MaxDifference { get; }
+
+        /// <summary>
+        /// Below this threshold, don't start tracking the rate of connection growth.
+        /// </summary>
+        public int MinConnectionCount { get; }
+
+        /// <summary>
+        /// If the connection count exceeds this threshold, signal failure anyway regardless of the averages.
+        /// Meant to act as a stop-loss mechanism in the event of a _very_ slow upward creep in connections over time.
+        /// </summary>
+        public int MaxConnectionCount { get; }
+
+        /// <summary>
+        /// The current number of connections.
+        /// </summary>
+        public int CurrentConnectionCount { get; private set; }
+
+        /// <summary>
+        /// Feed the next connection count into the <see cref="LeakDetector"/>.
+        /// </summary>
+        /// <param name="newConnectionCount">The updated connection count.</param>
+        /// <returns>The current <see cref="LeakDetector"/> instance but with updated state.</returns>
+        public LeakDetector Next(int newConnectionCount)
+        {
+            CurrentConnectionCount = newConnectionCount;
+            if (CurrentConnectionCount >= MinConnectionCount) // time to start using samples
+            {
+                // Used to signal that we've crossed the threshold
+                if (!_minThresholdBreached)
+                    _minThresholdBreached = true;
+
+                Long += CurrentConnectionCount;
+                Short += CurrentConnectionCount;
+            }
+            else if (_minThresholdBreached) // fell back below minimum for first time
+            {
+                _minThresholdBreached = false;
+
+                // reset averages back to starting position
+                Long = new EMWA(Long.Alpha, CurrentConnectionCount);
+                Short = new EMWA(Short.Alpha, CurrentConnectionCount);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> if the <see cref="CurrentConnectionCount"/> exceeds <see cref="MaxConnectionCount"/>
+        /// or if <see cref="RelativeDifference"/> exceeds <see cref="MaxDifference"/>.
+        /// </summary>
+        public bool ShouldFail => RelativeDifference >= MaxDifference || CurrentConnectionCount >= MaxConnectionCount;
+    }
+
     public class SocketLeakDetectorActor: UntypedActor
     {
         private readonly double _percDif; // Percent difference between Large Sample and Small Sample.
