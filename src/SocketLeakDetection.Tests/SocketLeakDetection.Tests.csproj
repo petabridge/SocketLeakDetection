@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Akka" Version="$(AkkaVersion)" />
+    <PackageReference Include="akka.testkit" Version="1.3.12" />
+    <PackageReference Include="Akka.TestKit.xunit" Version="1.3.12" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
     <PackageReference Include="xunit" Version="$(XunitVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
@@ -14,5 +17,9 @@
   <ItemGroup>
     <ProjectReference Include="..\SocketLeakDetection\SocketLeakDetection.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Update="akkaTest.hocon">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
