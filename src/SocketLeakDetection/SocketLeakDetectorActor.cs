@@ -180,25 +180,31 @@ namespace SocketLeakDetection
         {
             if (message is TcpCount count)
             {
+                _leakDetector.Next(count.CurrentPortCount);
+
                 if (_log.IsDebugEnabled)
+                {
                     _log.Debug("Received port count of {0} for interface {1}", count.CurrentPortCount,
                         count.HostInterface);
-                _leakDetector.Next(count.CurrentPortCount);
+                    _log.Debug("Danger threshold: {0} - Observed threshold: {1}", _leakDetector.MaxDifference, _leakDetector.RelativeDifference);
+                }
+                    
 
                 if (_leakDetector.ShouldFail && _breachSignal == null)
                 {
                     _log.Warning(
-                        "Current port count detected to be {0} for network{1}- triggering ActorSystem termination in {2} seconds unless port count stabilizes.",
-                        count, _settings.InterfaceAddress.ToString(), _settings.BreachDuration);
+                        "Current port count detected to be [{0}] for network [{1}] - triggering ActorSystem termination in {2} seconds unless port count stabilizes.",
+                        count.CurrentPortCount, count.HostInterface, _settings.BreachDuration);
                     _breachSignal = Context.System.Scheduler.ScheduleTellOnceCancelable(_settings.BreachDuration, Self,
                         TimerExpired.Instance, ActorRefs.NoSender);
                 }
-                else if (_breachSignal != null)
+                else if (!_leakDetector.ShouldFail && _breachSignal != null)
                 {
-                    _breachSignal.Cancel();
+                    _breachSignal?.Cancel();
+                    _breachSignal = null;
                     _log.Warning(
-                        "Port count back down to {0} for network{1}- within healthy levels. Cancelling shutdown.",
-                        count, _settings.ToString());
+                        "Port count back down to [{0}] for network [{1}] - within healthy levels. Cancelling shutdown.",
+                        count.CurrentPortCount, count.HostInterface);
                 }
             }
             else if (message is TimerExpired)
@@ -220,7 +226,6 @@ namespace SocketLeakDetection
         {
             _breachSignal?.Cancel();
         }
-
 
         public class TimerExpired
         {

@@ -14,11 +14,6 @@ namespace SocketLeakDetection
     ///     Constructor will setup the values that we will need to determine if we need to message our supervisor actor in case
     ///     we experience an increase in TCP connections
     /// </summary>
-    /// <param name="MaxConnections">Maximum number of connections allowed</param>
-    /// <param name="PercentDifference">Percent difference we set to send warning. Value can be between 0-1</param>
-    /// <param name="MaxDifference">Max percent difference allowed before we message the supervisor actor for temination</param>
-    /// <param name="LargeSampleSize">The sample size we want to use for the large sample EMWA</param>
-    /// <param name="SmallSampleSize">The sample size we want to use for the small sample EMWA</param>
     public class SocketLeakDetectorSettings
     {
         public const int DefaultMaxConnections = 16777214;
@@ -74,7 +69,6 @@ namespace SocketLeakDetection
         public int ShortSampleSize { get; set; }
         public int LongSampleSize { get; set; }
         public TimeSpan PortCheckInterval { get; set; }
-        public IPAddress InterfaceAddress { get; set; }
 
         /// <summary>
         ///     How long the <see cref="LeakDetector" /> needs report true prior
