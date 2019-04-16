@@ -28,7 +28,7 @@ namespace SocketLeakDetection
         public SocketLeakDetectorSettings(double maxDifference = DefaultMaxDifference,
             int maxConnections = DefaultMaxConnections, int minConnections = DefaultMinConnections,
             int smallSampleSize = DefaultShortSampleSize, int largeSampleSize = DefaultLongSampleSize,
-            TimeSpan? rate = null, TimeSpan? breachDuration = null)
+            TimeSpan? portCheckInterval = null, TimeSpan? breachDuration = null)
         {
             if (minConnections < 1)
                 throw new ArgumentOutOfRangeException(nameof(minConnections),
@@ -58,7 +58,7 @@ namespace SocketLeakDetection
                     "smallSampleSize must greater than largeSampleSize");
 
 
-            PortCheckInterval = rate ?? DefaultTcpPollInterval;
+            PortCheckInterval = portCheckInterval ?? DefaultTcpPollInterval;
             BreachDuration = breachDuration ?? DefaultBreachDuration;
             MinConnections = minConnections;
         }

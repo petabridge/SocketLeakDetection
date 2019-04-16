@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Akka.Actor;
 using Akka.Configuration;
@@ -21,10 +22,11 @@ namespace SocketLeakDetection
         private readonly Props _childProps;
         private readonly ILoggingAdapter _log = Context.GetLogger();
 
+        private readonly IReadOnlyList<IPAddress> _monitoredIPAddresses;
         private readonly SocketLeakDetectorSettings _settings;
         private IActorRef _tcpScanner;
 
-        
+
 
         /// <summary>
         ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
@@ -42,7 +44,7 @@ namespace SocketLeakDetection
         ///     Created using the default <see cref="SocketLeakDetectorSettings" />.
         ///     With Set list of IP Address to check for.
         /// </summary>
-        public TcpPortUseSupervisor(List<IPAddress> iPs) : this(new SocketLeakDetectorSettings(), iPs)
+        public TcpPortUseSupervisor(IEnumerable<IPAddress> ips) : this(new SocketLeakDetectorSettings(), ips)
         {
         }
 
@@ -60,14 +62,15 @@ namespace SocketLeakDetection
         ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
         ///     Actor System.
         /// </summary>
-        public TcpPortUseSupervisor(SocketLeakDetectorSettings settings , List<IPAddress> iPs)
+        public TcpPortUseSupervisor(SocketLeakDetectorSettings settings, IEnumerable<IPAddress> ips)
         {
             _settings = settings;
+            _monitoredIPAddresses = ips.ToList();
             _childProps = Props.Create(() => new SocketLeakDetectorActor(_settings, Self));
 
             Receive<TcpCount>(t =>
             {
-                if (iPs.Contains(t.HostInterface) || iPs.Count.Equals(0))
+                if (_monitoredIPAddresses.Count == 0 || _monitoredIPAddresses.Contains(t.HostInterface))
                 {
                     var childName = Uri.EscapeUriString(t.HostInterface.ToString());
                     var child = Context.Child(childName).GetOrElse(() =>
