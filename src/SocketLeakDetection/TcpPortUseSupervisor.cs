@@ -5,6 +5,8 @@
 // -----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Net;
 using Akka.Actor;
 using Akka.Configuration;
 using Akka.Event;
@@ -22,12 +24,35 @@ namespace SocketLeakDetection
         private readonly SocketLeakDetectorSettings _settings;
         private IActorRef _tcpScanner;
 
+        
+
         /// <summary>
         ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
         ///     Actor System.
         ///     Created using the default <see cref="SocketLeakDetectorSettings" />.
+        ///     No IP Address specified to check for, all IP Address will be checked. 
         /// </summary>
-        public TcpPortUseSupervisor() : this(new SocketLeakDetectorSettings())
+        public TcpPortUseSupervisor() : this(new SocketLeakDetectorSettings(), new List<IPAddress>())
+        {
+        }
+
+        /// <summary>
+        ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
+        ///     Actor System.
+        ///     Created using the default <see cref="SocketLeakDetectorSettings" />.
+        ///     With Set list of IP Address to check for.
+        /// </summary>
+        public TcpPortUseSupervisor(List<IPAddress> iPs) : this(new SocketLeakDetectorSettings(), iPs)
+        {
+        }
+
+        /// <summary>
+        ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
+        ///     Actor System.
+        ///     Created using the default <see cref="SocketLeakDetectorSettings" />.
+        ///     With Set list of IP Address to check for.
+        /// </summary>
+        public TcpPortUseSupervisor(SocketLeakDetectorSettings settings) : this(new SocketLeakDetectorSettings(), new List<IPAddress>())
         {
         }
 
@@ -35,18 +60,21 @@ namespace SocketLeakDetection
         ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
         ///     Actor System.
         /// </summary>
-        public TcpPortUseSupervisor(SocketLeakDetectorSettings settings)
+        public TcpPortUseSupervisor(SocketLeakDetectorSettings settings , List<IPAddress> iPs)
         {
             _settings = settings;
             _childProps = Props.Create(() => new SocketLeakDetectorActor(_settings, Self));
 
             Receive<TcpCount>(t =>
             {
-                var childName = Uri.EscapeUriString(t.HostInterface.ToString());
-                var child = Context.Child(childName).GetOrElse(() =>
-                    Context.ActorOf(_childProps, childName));
+                if (iPs.Contains(t.HostInterface) || iPs.Count.Equals(0))
+                {
+                    var childName = Uri.EscapeUriString(t.HostInterface.ToString());
+                    var child = Context.Child(childName).GetOrElse(() =>
+                        Context.ActorOf(_childProps, childName));
 
-                child.Forward(t);
+                    child.Forward(t);
+                }
             });
 
             Receive<Shutdown>(_ =>
