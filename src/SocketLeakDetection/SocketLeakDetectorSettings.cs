@@ -16,12 +16,12 @@ namespace SocketLeakDetection
     /// </summary>
     public class SocketLeakDetectorSettings
     {
-        public const int DefaultMaxConnections = 16777214;
+        public const int DefaultMaxConnections = 65536;
         public const int DefaultMinConnections = 100;
         public const double DefaultMaxDifference = 0.20;
-        public const int DefaultLongSampleSize = 25;
+        public const int DefaultLongSampleSize = 50;
         public const int DefaultShortSampleSize = 10;
-        public static readonly TimeSpan DefaultTcpPollInterval = TimeSpan.FromMilliseconds(500);
+        public static readonly TimeSpan DefaultTcpPollInterval = TimeSpan.FromMilliseconds(1000);
         public static readonly TimeSpan DefaultBreachDuration = TimeSpan.FromSeconds(DefaultLongSampleSize / 2.0);
 
 
