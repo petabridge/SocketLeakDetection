@@ -1,6 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="LeakDetectorScenarioTests.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
 using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -40,20 +44,44 @@ namespace SocketLeakDetection.Tests
         public static IEnumerable<object[]> GetSocketScenarios()
         {
             // scenario that stays under the min connection threshold
-            yield return new object[]{ new SocketScenario(new[] {10, 20, 30, 40, 50, 60, 70, 80, 70, 70},
-                new SocketLeakDetectorSettings(), false) };
+            yield return new object[]
+            {
+                new SocketScenario(new[] {10, 20, 30, 40, 50, 60, 70, 80, 70, 70},
+                    new SocketLeakDetectorSettings(), false)
+            };
 
             // ramp-up scenario above the min connection threshold with larger long sample window
-            yield return new object[]{ new SocketScenario(new[] {100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230},
-                new SocketLeakDetectorSettings(largeSampleSize:40), true) };
+            yield return new object[]
+            {
+                new SocketScenario(
+                    new[]
+                    {
+                        100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230
+                    },
+                    new SocketLeakDetectorSettings(largeSampleSize: 40), true)
+            };
 
             // ramp-up scenario above the min connection threshold with smaller long sample window
-            yield return new object[]{ new SocketScenario(new[] {100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230},
-                new SocketLeakDetectorSettings(largeSampleSize:25), false) };
+            yield return new object[]
+            {
+                new SocketScenario(
+                    new[]
+                    {
+                        100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230
+                    },
+                    new SocketLeakDetectorSettings(largeSampleSize: 25), false)
+            };
 
             // exceed max connections
-            yield return new object[]{ new SocketScenario(new[] {100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230},
-                new SocketLeakDetectorSettings(maxConnections:200), true) };
+            yield return new object[]
+            {
+                new SocketScenario(
+                    new[]
+                    {
+                        100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230
+                    },
+                    new SocketLeakDetectorSettings(maxConnections: 200), true)
+            };
         }
 
         [Theory]
@@ -64,15 +92,15 @@ namespace SocketLeakDetection.Tests
             foreach (var i in scenario.SocketCounts)
             {
                 leakDetector.Next(i);
-                _helper.WriteLine("Connections: {0}, Observed % Diff: {1}, Fail? {2}", i, leakDetector.RelativeDifference, leakDetector.ShouldFail);
+                _helper.WriteLine("Connections: {0}, Observed % Diff: {1}, Fail? {2}", i,
+                    leakDetector.RelativeDifference, leakDetector.ShouldFail);
                 if (!scenario.ShouldFail) // if we can't fail in this scenario, no intermittent failures allowed
-                {
                     scenario.ShouldFail.Should().BeFalse();
-                }
             }
 
             leakDetector.ShouldFail.Should().Be(scenario.ShouldFail,
-                "Failure state should have been {0}, but was {1} in scenario {2}. Final % difference: {3} vs. target of {4}", scenario.ShouldFail,
+                "Failure state should have been {0}, but was {1} in scenario {2}. Final % difference: {3} vs. target of {4}",
+                scenario.ShouldFail,
                 leakDetector.ShouldFail, scenario, leakDetector.RelativeDifference, scenario.Settings.MaxDifference);
         }
     }

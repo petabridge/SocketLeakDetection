@@ -1,27 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// -----------------------------------------------------------------------
+// <copyright file="TcpCounter.cs" company="Petabridge, LLC">
+//      Copyright (C) 2015 - 2019 Petabridge, LLC <https://petabridge.com>
+// </copyright>
+// -----------------------------------------------------------------------
+
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
 
 namespace SocketLeakDetection
 {
     public class TcpCounter : ITcpCounter
     {
-        IPAddress Address;
+        private readonly IPAddress Address;
+
         public TcpCounter(IPAddress address)
         {
             Address = address;
         }
+
         public int GetTcpCount()
         {
-            IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-            IPEndPoint[] iPEndPoints = ipProperties.GetActiveTcpListeners();
+            var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+            var iPEndPoints = ipProperties.GetActiveTcpListeners();
 
             var ports = from points in iPEndPoints
-                        where points.Address.ToString().Contains(Address.ToString())
-                        select points.Port;
+                where points.Address.ToString().Contains(Address.ToString())
+                select points.Port;
 
             return ports.Count();
         }

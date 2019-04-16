@@ -1,6 +1,6 @@
 # SocketLeakDetection
 
-Update this readme file with your details.
+Stand-alone application and Akka.NET actors who can detect socket leaks and port exhaustion anywhere on the local system.
 
 ## Building this solution
 To run the build script associated with this solution, execute the following:

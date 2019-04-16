@@ -4,22 +4,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Your description here.</Description>
+    <Description>Stand-alone Akka.NET package designed to help instrument detection of possible port exhaustion.</Description>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
-    <StartupObject></StartupObject>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
 
 
   <ItemGroup>

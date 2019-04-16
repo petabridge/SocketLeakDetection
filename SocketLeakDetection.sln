@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocketLeakDetection", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocketLeakDetection.Tests", "src\SocketLeakDetection.Tests\SocketLeakDetection.Tests.csproj", "{9A9D15BC-8E38-4A7B-AC59-965115617568}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeCounterSample", "src\FakeCounterSample\FakeCounterSample.csproj", "{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketLeakDetection.Simple.Demo", "src\SocketLeakDetection.Simple.Demo\SocketLeakDetection.Simple.Demo.csproj", "{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{1DBA19CE-CAD3-4AC3-91F8-FD434A524ACD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,21 +45,24 @@ Global
 		{9A9D15BC-8E38-4A7B-AC59-965115617568}.Release|x64.Build.0 = Release|Any CPU
 		{9A9D15BC-8E38-4A7B-AC59-965115617568}.Release|x86.ActiveCfg = Release|Any CPU
 		{9A9D15BC-8E38-4A7B-AC59-965115617568}.Release|x86.Build.0 = Release|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Debug|x64.Build.0 = Debug|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Debug|x86.Build.0 = Debug|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Release|x64.ActiveCfg = Release|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Release|x64.Build.0 = Release|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Release|x86.ActiveCfg = Release|Any CPU
-		{3199AA3C-7173-4F5B-8839-EE1A0A181A5E}.Release|x86.Build.0 = Release|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Debug|x64.Build.0 = Debug|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Debug|x86.Build.0 = Debug|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Release|x64.ActiveCfg = Release|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Release|x64.Build.0 = Release|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Release|x86.ActiveCfg = Release|Any CPU
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97C4CCAF-72FB-43EF-A4DF-8BB5951E2985} = {1DBA19CE-CAD3-4AC3-91F8-FD434A524ACD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7463B3C5-BC50-4032-ADDD-C2F2632D58FF}
