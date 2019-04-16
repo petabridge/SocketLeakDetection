@@ -43,9 +43,17 @@ namespace SocketLeakDetection.Tests
             yield return new object[]{ new SocketScenario(new[] {10, 20, 30, 40, 50, 60, 70, 80, 70, 70},
                 new SocketLeakDetectorSettings(), false) };
 
-            // aggressive ramp-up scenario above the min connection threshold
-            yield return new object[]{ new SocketScenario(new[] {100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230},
-                new SocketLeakDetectorSettings(), false) };
+            // ramp-up scenario above the min connection threshold with larger long sample window
+            yield return new object[]{ new SocketScenario(new[] {100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230},
+                new SocketLeakDetectorSettings(largeSampleSize:40), true) };
+
+            // ramp-up scenario above the min connection threshold with smaller long sample window
+            yield return new object[]{ new SocketScenario(new[] {100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230},
+                new SocketLeakDetectorSettings(largeSampleSize:25), false) };
+
+            // exceed max connections
+            yield return new object[]{ new SocketScenario(new[] {100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230},
+                new SocketLeakDetectorSettings(maxConnections:200), true) };
         }
 
         [Theory]
