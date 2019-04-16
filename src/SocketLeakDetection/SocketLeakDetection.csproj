@@ -14,10 +14,5 @@
   <ItemGroup>
     <PackageReference Include="Akka" Version="$(AkkaVersion)" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="akka.hocon">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
 </Project>
