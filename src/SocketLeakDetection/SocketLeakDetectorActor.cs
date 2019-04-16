@@ -188,7 +188,7 @@ namespace SocketLeakDetection
                 var count = _tCounter.GetTcpCount(); //Get TCP count
                 _leakDetector.Next(count);
 
-                if (_leakDetector.ShouldFail)
+                if (_leakDetector.ShouldFail && _breachSignal == null)
                 {
                     _log.Warning("Current port count detected to be {0} - triggering ActorSystem termination in {1} seconds unless port count stabilizes.", count, _settings.BreachDuration);
                     _breachSignal = Context.System.Scheduler.ScheduleTellOnceCancelable(_settings.BreachDuration, Self,
