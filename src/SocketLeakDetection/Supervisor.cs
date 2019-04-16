@@ -21,7 +21,8 @@ namespace SocketLeakDetection
         {
             GetConfig(config);
             var settings = new SocketLeakDetectorSettings();
-            System.ActorOf(Props.Create(() => new SocketLeakDetectorActor(settings, counter, Self)));
+
+            System.ActorOf(Props.Create(() => new TcpPortMonitoringActor(Self,settings,System)));
             Receive<Stat>(s =>
             {
                 if (s.CurretStatus == 2) // Status of 2 signal we need to Teminate Actor system as we have reached either the max number of TCP connections

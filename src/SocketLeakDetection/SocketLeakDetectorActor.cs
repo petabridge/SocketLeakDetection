@@ -190,14 +190,14 @@ namespace SocketLeakDetection
 
                 if (_leakDetector.ShouldFail && _breachSignal == null)
                 {
-                    _log.Warning("Current port count detected to be {0} - triggering ActorSystem termination in {1} seconds unless port count stabilizes.", count, _settings.BreachDuration);
+                    _log.Warning("Current port count detected to be {0} for network{1}- triggering ActorSystem termination in {2} seconds unless port count stabilizes.", count,_settings.InterfaceAddress.ToString(), _settings.BreachDuration);
                     _breachSignal = Context.System.Scheduler.ScheduleTellOnceCancelable(_settings.BreachDuration, Self,
                         TimerExpired.Instance, ActorRefs.NoSender);
                 }
                 else if(_breachSignal != null)
                 {
                     _breachSignal.Cancel();
-                    _log.Warning("Port count back down to {0} - within healthy levels. Cancelling shutdown.", count);
+                    _log.Warning("Port count back down to {0} for network{1}- within healthy levels. Cancelling shutdown.", count,_settings.ToString());
                 }
             }
             else if(message is TimerExpired)
