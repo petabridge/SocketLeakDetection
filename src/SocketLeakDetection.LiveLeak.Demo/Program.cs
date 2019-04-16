@@ -10,7 +10,7 @@ namespace SocketLeakDetection.LiveLeak.Demo
 {
     class Program
     {
-        public class TcpConnectionActor : ReceiveActor
+        public class TcpPortActor : ReceiveActor
         {
             private readonly ILoggingAdapter _log = Context.GetLogger();
             private readonly EndPoint _hostEp;
@@ -22,7 +22,7 @@ namespace SocketLeakDetection.LiveLeak.Demo
                 private DoConnect() { }
             }
 
-            public TcpConnectionActor(EndPoint hostEp)
+            public TcpPortActor(EndPoint hostEp)
             {
                 _hostEp = hostEp;
 
@@ -97,9 +97,9 @@ namespace SocketLeakDetection.LiveLeak.Demo
             {
                 Receive<Tcp.Connected>(conn =>
                 {
-                    _log.Info("Connection from client [{0}]", conn.RemoteAddress);
-                    var connection = Sender;
-                    connection.Tell(new Tcp.Register(Self, true), Self);
+                    _log.Info("Port  from client [{0}]", conn.RemoteAddress);
+                    var port = Sender;
+                    port.Tell(new Tcp.Register(Self, true), Self);
                 });
 
                 Receive<GetInboundEndpoint>(_ => Sender.Tell(_boundAddress));
@@ -149,7 +149,7 @@ namespace SocketLeakDetection.LiveLeak.Demo
 
             var tcp = actorSystem.ActorOf(Props.Create(() => new TcpHostActor()), "tcp");
             var endpoint = await tcp.Ask<EndPoint>(TcpHostActor.GetInboundEndpoint.Instance, TimeSpan.FromSeconds(3));
-            var spawner = actorSystem.ActorOf(Props.Create(() => new TcpConnectionActor(endpoint)), "leaker");
+            var spawner = actorSystem.ActorOf(Props.Create(() => new TcpPortActor(endpoint)), "leaker");
 
             await actorSystem.WhenTerminated;
         }

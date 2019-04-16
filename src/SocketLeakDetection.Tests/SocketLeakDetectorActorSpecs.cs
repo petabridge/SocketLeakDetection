@@ -23,7 +23,7 @@ namespace SocketLeakDetection.Tests
         public SocketLeakDetectorActorSpecs(ITestOutputHelper output) : base(output:output, config:"akka.loglevel=DEBUG")
         {
             // keep a really short breach duration in order to make testing more expedient
-            _settings = new SocketLeakDetectorSettings(breachDuration:TimeSpan.FromMilliseconds(100), maxConnections:200);
+            _settings = new SocketLeakDetectorSettings(breachDuration:TimeSpan.FromMilliseconds(100), maxPorts:200);
         }
 
         [Fact(DisplayName = "SocketLeakDetectorActor should send breach signal upon LeakDetector signal")]

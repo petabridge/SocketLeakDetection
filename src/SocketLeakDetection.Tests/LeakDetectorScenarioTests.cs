@@ -43,14 +43,14 @@ namespace SocketLeakDetection.Tests
 
         public static IEnumerable<object[]> GetSocketScenarios()
         {
-            // scenario that stays under the min connection threshold
+            // scenario that stays under the min port threshold
             yield return new object[]
             {
                 new SocketScenario(new[] {10, 20, 30, 40, 50, 60, 70, 80, 70, 70},
                     new SocketLeakDetectorSettings(), false)
             };
 
-            // ramp-up scenario above the min connection threshold with larger long sample window
+            // ramp-up scenario above the min port threshold with larger long sample window
             yield return new object[]
             {
                 new SocketScenario(
@@ -61,7 +61,7 @@ namespace SocketLeakDetection.Tests
                     new SocketLeakDetectorSettings(largeSampleSize: 40), true)
             };
 
-            // ramp-up scenario above the min connection threshold with smaller long sample window
+            // ramp-up scenario above the min port threshold with smaller long sample window
             yield return new object[]
             {
                 new SocketScenario(
@@ -72,7 +72,7 @@ namespace SocketLeakDetection.Tests
                     new SocketLeakDetectorSettings(largeSampleSize: 25), false)
             };
 
-            // exceed max connections
+            // exceed max ports
             yield return new object[]
             {
                 new SocketScenario(
@@ -80,7 +80,7 @@ namespace SocketLeakDetection.Tests
                     {
                         100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 200, 200, 210, 220, 230, 230, 230, 230, 230
                     },
-                    new SocketLeakDetectorSettings(maxConnections: 200), true)
+                    new SocketLeakDetectorSettings(maxPorts: 200), true)
             };
         }
 
@@ -92,7 +92,7 @@ namespace SocketLeakDetection.Tests
             foreach (var i in scenario.SocketCounts)
             {
                 leakDetector.Next(i);
-                _helper.WriteLine("Connections: {0}, Observed % Diff: {1}, Fail? {2}", i,
+                _helper.WriteLine("ports: {0}, Observed % Diff: {1}, Fail? {2}", i,
                     leakDetector.RelativeDifference, leakDetector.ShouldFail);
                 if (!scenario.ShouldFail) // if we can't fail in this scenario, no intermittent failures allowed
                     scenario.ShouldFail.Should().BeFalse();

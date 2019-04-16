@@ -19,7 +19,7 @@ namespace SocketLeakDetection.Tests
         {
             // keep a really short breach duration in order to make testing more expedient
             _settings = new SocketLeakDetectorSettings(breachDuration: TimeSpan.FromMilliseconds(100),
-                maxConnections: 2, minConnections: 1) {PortCheckInterval = TimeSpan.FromMilliseconds(100)};
+                maxPorts: 2, minPorts: 1) {PortCheckInterval = TimeSpan.FromMilliseconds(100)};
         }
 
         private readonly SocketLeakDetectorSettings _settings;

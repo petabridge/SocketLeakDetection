@@ -57,31 +57,31 @@ namespace SocketLeakDetection
         private bool _minThresholdBreached;
 
         public LeakDetector(SocketLeakDetectorSettings settings)
-            : this(settings.MinConnections, settings.MaxDifference,
-                settings.MaxConnections, settings.ShortSampleSize, settings.LongSampleSize)
+            : this(settings.MinPorts, settings.MaxDifference,
+                settings.MaxPorts, settings.ShortSampleSize, settings.LongSampleSize)
         {
         }
 
-        public LeakDetector(int minConnectionCount, double maxDifference, int maxConnectionCount,
+        public LeakDetector(int minPortCount, double maxDifference, int maxPortCount,
             int shortSampleSize = DefaultShortSampleSize, int longSampleSize = DefaultLongSampleSize)
         {
-            MinConnectionCount = minConnectionCount;
-            if (MinConnectionCount < 1)
-                throw new ArgumentOutOfRangeException(nameof(minConnectionCount),
-                    "MinConnectionCount must be at least 1");
+            MinPortCount = minPortCount;
+            if (MinPortCount < 1)
+                throw new ArgumentOutOfRangeException(nameof(minPortCount),
+                    "MinPortCount must be at least 1");
 
             MaxDifference = maxDifference;
             if (MaxDifference <= 0.0d)
                 throw new ArgumentOutOfRangeException(nameof(maxDifference), "MaxDifference must be greater than 0.0");
 
-            MaxConnectionCount = maxConnectionCount;
-            if (MaxConnectionCount <= MinConnectionCount)
-                throw new ArgumentOutOfRangeException(nameof(maxConnectionCount),
-                    "MaxConnectionCount must be greater than MinConnectionCount");
+            MaxPortCount = maxPortCount;
+            if (MaxPortCount <= MinPortCount)
+                throw new ArgumentOutOfRangeException(nameof(maxPortCount),
+                    "MaxPortCount must be greater than MinPortCount");
 
-            // default both EMWAs to the minimum connection count.
-            Short = EMWA.Init(shortSampleSize, minConnectionCount);
-            Long = EMWA.Init(longSampleSize, minConnectionCount);
+            // default both EMWAs to the minimum port count.
+            Short = EMWA.Init(shortSampleSize, minPortCount);
+            Long = EMWA.Init(longSampleSize, minPortCount);
         }
 
         /// <summary>
@@ -99,51 +99,51 @@ namespace SocketLeakDetection
         public double MaxDifference { get; }
 
         /// <summary>
-        ///     Below this threshold, don't start tracking the rate of connection growth.
+        ///     Below this threshold, don't start tracking the rate of port growth.
         /// </summary>
-        public int MinConnectionCount { get; }
+        public int MinPortCount { get; }
 
         /// <summary>
-        ///     If the connection count exceeds this threshold, signal failure anyway regardless of the averages.
-        ///     Meant to act as a stop-loss mechanism in the event of a _very_ slow upward creep in connections over time.
+        ///     If the port count exceeds this threshold, signal failure anyway regardless of the averages.
+        ///     Meant to act as a stop-loss mechanism in the event of a _very_ slow upward creep in ports over time.
         /// </summary>
-        public int MaxConnectionCount { get; }
+        public int MaxPortCount { get; }
 
         /// <summary>
-        ///     The current number of connections.
+        ///     The current number of ports.
         /// </summary>
-        public int CurrentConnectionCount { get; private set; }
+        public int CurrentPortCount { get; private set; }
 
         /// <summary>
-        ///     Returns <c>true</c> if the <see cref="CurrentConnectionCount" /> exceeds <see cref="MaxConnectionCount" />
+        ///     Returns <c>true</c> if the <see cref="CurrentPortCount" /> exceeds <see cref="MaxPortCount" />
         ///     or if <see cref="RelativeDifference" /> exceeds <see cref="MaxDifference" />.
         /// </summary>
-        public bool ShouldFail => RelativeDifference >= MaxDifference || CurrentConnectionCount >= MaxConnectionCount;
+        public bool ShouldFail => RelativeDifference >= MaxDifference || CurrentPortCount >= MaxPortCount;
 
         /// <summary>
-        ///     Feed the next connection count into the <see cref="LeakDetector" />.
+        ///     Feed the next port count into the <see cref="LeakDetector" />.
         /// </summary>
-        /// <param name="newConnectionCount">The updated connection count.</param>
+        /// <param name="newPortCount">The updated port count.</param>
         /// <returns>The current <see cref="LeakDetector" /> instance but with updated state.</returns>
-        public LeakDetector Next(int newConnectionCount)
+        public LeakDetector Next(int newPortCount)
         {
-            CurrentConnectionCount = newConnectionCount;
-            if (CurrentConnectionCount >= MinConnectionCount) // time to start using samples
+            CurrentPortCount = newPortCount;
+            if (CurrentPortCount >= MinPortCount) // time to start using samples
             {
                 // Used to signal that we've crossed the threshold
                 if (!_minThresholdBreached)
                     _minThresholdBreached = true;
 
-                Long += CurrentConnectionCount;
-                Short += CurrentConnectionCount;
+                Long += CurrentPortCount;
+                Short += CurrentPortCount;
             }
             else if (_minThresholdBreached) // fell back below minimum for first time
             {
                 _minThresholdBreached = false;
 
                 // reset averages back to starting position
-                Long = new EMWA(Long.Alpha, CurrentConnectionCount);
-                Short = new EMWA(Short.Alpha, CurrentConnectionCount);
+                Long = new EMWA(Long.Alpha, CurrentPortCount);
+                Short = new EMWA(Short.Alpha, CurrentPortCount);
             }
 
             return this;
@@ -166,7 +166,7 @@ namespace SocketLeakDetection
 
         /// <summary>
         ///     Constructor will setup the values that we will need to determine if we need to message our supervisor actor in case
-        ///     we experience an increase in TCP connections
+        ///     we experience an increase in TCP ports
         /// </summary>
         /// <param name="settings">The settings for this actor's leak detection algorithm.</param>
         /// <param name="supervisor">Actor Reference for the Supervisor Actor in charge of terminating Actor System</param>

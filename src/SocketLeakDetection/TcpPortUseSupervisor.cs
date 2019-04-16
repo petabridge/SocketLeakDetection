@@ -29,7 +29,7 @@ namespace SocketLeakDetection
 
 
         /// <summary>
-        ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
+        ///     Supervisor actor used to determine if we need to log warning about increase in TCP ports or terminate the
         ///     Actor System.
         ///     Created using the default <see cref="SocketLeakDetectorSettings" />.
         ///     No IP Address specified to check for, all IP Address will be checked. 
@@ -39,7 +39,7 @@ namespace SocketLeakDetection
         }
 
         /// <summary>
-        ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
+        ///     Supervisor actor used to determine if we need to log warning about increase in TCP ports or terminate the
         ///     Actor System.
         ///     Created using the default <see cref="SocketLeakDetectorSettings" />.
         ///     With Set list of IP Address to check for.
@@ -49,7 +49,7 @@ namespace SocketLeakDetection
         }
 
         /// <summary>
-        ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
+        ///     Supervisor actor used to determine if we need to log warning about increase in TCP ports or terminate the
         ///     Actor System.
         ///     Created using the default <see cref="SocketLeakDetectorSettings" />.
         ///     With Set list of IP Address to check for.
@@ -59,7 +59,7 @@ namespace SocketLeakDetection
         }
 
         /// <summary>
-        ///     Supervisor actor used to determine if we need to log warning about increase in TCP connections or terminate the
+        ///     Supervisor actor used to determine if we need to log warning about increase in TCP ports or terminate the
         ///     Actor System.
         /// </summary>
         public TcpPortUseSupervisor(SocketLeakDetectorSettings settings, IEnumerable<IPAddress> ips)

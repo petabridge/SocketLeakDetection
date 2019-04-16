@@ -12,12 +12,12 @@ namespace SocketLeakDetection
 {
     /// <summary>
     ///     Constructor will setup the values that we will need to determine if we need to message our supervisor actor in case
-    ///     we experience an increase in TCP connections
+    ///     we experience an increase in TCP Ports
     /// </summary>
     public class SocketLeakDetectorSettings
     {
-        public const int DefaultMaxConnections = 65536;
-        public const int DefaultMinConnections = 100;
+        public const int DefaultMaxPorts = 65536;
+        public const int DefaultMinPorts = 100;
         public const double DefaultMaxDifference = 0.20;
         public const int DefaultLongSampleSize = 50;
         public const int DefaultShortSampleSize = 10;
@@ -26,19 +26,19 @@ namespace SocketLeakDetection
 
 
         public SocketLeakDetectorSettings(double maxDifference = DefaultMaxDifference,
-            int maxConnections = DefaultMaxConnections, int minConnections = DefaultMinConnections,
+            int maxPorts = DefaultMaxPorts, int minPorts = DefaultMinPorts,
             int smallSampleSize = DefaultShortSampleSize, int largeSampleSize = DefaultLongSampleSize,
             TimeSpan? portCheckInterval = null, TimeSpan? breachDuration = null)
         {
-            if (minConnections < 1)
-                throw new ArgumentOutOfRangeException(nameof(minConnections),
-                    "Min connections must be greater than or equal to 1.");
+            if (minPorts < 1)
+                throw new ArgumentOutOfRangeException(nameof(minPorts),
+                    "minPorts must be greater than or equal to 1.");
 
-            if (maxConnections > minConnections)
-                MaxConnections = maxConnections;
+            if (maxPorts > minPorts)
+                MaxPorts = maxPorts;
             else
-                throw new ArgumentOutOfRangeException(nameof(maxConnections),
-                    "maxConnections must be greater than minConnections");
+                throw new ArgumentOutOfRangeException(nameof(maxPorts),
+                    "maxPors must be greater than minPorts");
 
             if (maxDifference > 0)
                 MaxDifference = maxDifference;
@@ -60,12 +60,12 @@ namespace SocketLeakDetection
 
             PortCheckInterval = portCheckInterval ?? DefaultTcpPollInterval;
             BreachDuration = breachDuration ?? DefaultBreachDuration;
-            MinConnections = minConnections;
+            MinPorts = minPorts;
         }
 
         public double MaxDifference { get; set; }
-        public int MaxConnections { get; set; }
-        public int MinConnections { get; set; }
+        public int MaxPorts { get; set; }
+        public int MinPorts { get; set; }
         public int ShortSampleSize { get; set; }
         public int LongSampleSize { get; set; }
         public TimeSpan PortCheckInterval { get; set; }
@@ -79,7 +79,7 @@ namespace SocketLeakDetection
         public override string ToString()
         {
             return
-                $"SocketLeakDetectorSettings(MaxDifference={MaxDifference}, MaxConnections={MaxConnections}, MinConnections={MinConnections}" +
+                $"SocketLeakDetectorSettings(MaxDifference={MaxDifference}, MaxPorts={MaxPorts}, MinPorts={MinPorts}" +
                 $"ShortSampleSize={ShortSampleSize}, LargeSampleSize={LongSampleSize}," +
                 $"PortCheckInterval={PortCheckInterval}, BreachDuration={BreachDuration}";
         }
