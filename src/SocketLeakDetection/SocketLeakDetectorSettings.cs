@@ -1,4 +1,5 @@
 using System;
+using Akka.Actor;
 
 namespace SocketLeakDetection
 {
@@ -18,9 +19,10 @@ namespace SocketLeakDetection
         public const int DefaultLongSampleSize = 25;
         public const int DefaultShortSampleSize = 10;
         public static readonly TimeSpan DefaultTcpPollInterval = TimeSpan.FromMilliseconds(500);
+        public static readonly TimeSpan DefaultBreachDuration = TimeSpan.FromSeconds(DefaultLongSampleSize/2.0);
 
         public SocketLeakDetectorSettings(double maxDifference = DefaultMaxDifference, int maxConnections = DefaultMaxConnections, int minConnections = DefaultMinConnections,
-                int smallSampleSize = DefaultShortSampleSize, int largeSampleSize = DefaultLongSampleSize, TimeSpan? rate = null)
+                int smallSampleSize = DefaultShortSampleSize, int largeSampleSize = DefaultLongSampleSize, TimeSpan? rate = null, TimeSpan? breachDuration = null)
         {
             if(minConnections < 1)
                 throw new ArgumentOutOfRangeException(nameof(minConnections), "Min connections must be greater than or equal to 1.");
@@ -46,7 +48,8 @@ namespace SocketLeakDetection
             else
                 throw new ArgumentOutOfRangeException(nameof(smallSampleSize), "smallSampleSize must greater than largeSampleSize");
 
-            Rate = rate ?? DefaultTcpPollInterval;
+            PortCheckInterval = rate ?? DefaultTcpPollInterval;
+            BreachDuration = breachDuration ?? DefaultBreachDuration;
             MinConnections = minConnections;
         }
         public double MaxDifference { get; set; }
@@ -54,13 +57,19 @@ namespace SocketLeakDetection
         public int MinConnections { get; set; }
         public int ShortSampleSize { get; set; }
         public int LongSampleSize { get; set; }
-        public TimeSpan Rate { get; set; }
+        public TimeSpan PortCheckInterval { get; set; }
+
+        /// <summary>
+        /// How long the <see cref="LeakDetector"/> needs report true prior
+        /// to firing off an <see cref="ActorSystem"/> termination event.
+        /// </summary>
+        public TimeSpan BreachDuration { get; set; }
 
         public override string ToString()
         {
             return $"SocketLeakDetectorSettings(MaxDifference={MaxDifference}, MaxConnections={MaxConnections}, MinConnections={MinConnections}" +
                    $"ShortSampleSize={ShortSampleSize}, LargeSampleSize={LongSampleSize}," +
-                   $"CheckInterval={Rate})";
+                   $"PortCheckInterval={PortCheckInterval}, BreachDuration={BreachDuration})";
         }
 
     }

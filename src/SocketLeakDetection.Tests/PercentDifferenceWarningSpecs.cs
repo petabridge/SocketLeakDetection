@@ -17,7 +17,8 @@ namespace SocketLeakDetection.Tests
         public void MessageShouldBeSentWhenRiseIsHigh()
         {
             var counter = new FakeCounter(600);
-            var Watcher = Sys.ActorOf(Props.Create(() => new SocketLeakDetectorActor(1500,0.1, 0.2, 120, 20, counter, TestActor)));
+            var settings = new SocketLeakDetectorSettings();
+            var Watcher = Sys.ActorOf(Props.Create(() => new SocketLeakDetectorActor(settings, counter, TestActor)));
             for (var i = 0; i < 1000000; i++)
             {
                 if (i % 100 == 0)
