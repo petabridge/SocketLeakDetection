@@ -145,7 +145,9 @@ namespace SocketLeakDetection.LiveLeak.Demo
 
             var cmd = PetabridgeCmd.Get(actorSystem);
             cmd.Start();
+            //IEnumerable<IPAddress>
 
+            SocketLeakDetectorSettings settings = new SocketLeakDetectorSettings { };
 
             var tcp = actorSystem.ActorOf(Props.Create(() => new TcpHostActor()), "tcp");
             var endpoint = await tcp.Ask<EndPoint>(TcpHostActor.GetInboundEndpoint.Instance, TimeSpan.FromSeconds(3));
