@@ -69,26 +69,26 @@ This will invoke the `SignClient` and actually execute code signing against your
 
 If one of these two values isn't provided, the code signing stage will skip itself and simply produce unsigned NuGet code packages.
 
-##Project Description
+## Project Description
 
-This project is designed to help detect a sudden increase in the TCP port count in a system, and gracefully shutdown the `ActorSystem` when this is observed. The configuration can be set to monitor slow increases or fast spikes in TCP port growth for one ore more local endpoints. 
+This project is designed to help detect a sudden increase in the TCP port count in a system, and gracefully shutdown the `ActorSystem` when this is observed. The configuration can be set to monitor slow increases or fast spikes in TCP port growth for one or more local endpoints. 
 
-###Methodology 
-
+### Methodology 
+ 
 The impulse response is done through the use of an Exponential Weighted Moving Average(EWMA). `EWMA` allows the observer to determine how much weight we want to emphasize in older readings versus newer readings. 
 
-To calculate when a large increase in TCP ports is detected, two EWMA's will be taken. One will have a short sample size and the second will have a larger sample size. Having a shorter sample size will result in the average being more responsive to change. Where a larger sample size will smooth out quick changes and be less responsive to change.
+To calculate when a large increase in TCP ports is detected, two EWMA's will be taken. One will have a short sample size and the second will have a large sample size. Having a shorter sample size will result in the average being more responsive to change. Where a larger sample size will smooth out quick changes and be less responsive to change.
 
-Using this behavior, we compare the two EWMA's and determine the difference between the two. When a spike in TCP port count is experienced, the short sample EWMA will grow faster than the long sample EWMA will take longer to normalize. The percent difference between the two, will signal how quickly the TCP growth is. To monitor a fast change and have the system be more responsive to an increase, you will want to keep these sample sizes smaller. If you would like to monitor slower gradual changes, the sample rates can be increased. 
+Using this behavior, we compare the two EWMA's and determine the difference between the two. When a spike in TCP port count is experienced, the short sample EWMA will grow faster than the long sample EWMA. The percent difference between the two will signal how quickly the TCP growth is. To monitor a fast change and have the system be more responsive to an increase, you will want to keep these sample sizes smaller. If you would like to monitor slower gradual changes, the sample rates can be increased. 
 
-The main way to detect a growth in TCP port count will be through the use of these average differences. However you may have a case where the growth in TCP port count is gradually increasing. Gradual enough where the difference between the two averages does not trigger a warning. To prevent the system from reaching a TCP exhaustion in such a a case, a limit can be set on the maximum number of ports an endpoint can have. When this maximum amount is set, the `ActorSystm` will be terminated when the port count exceeds this threshold. 
+The main way to detect a growth in TCP port count will be through the use of these average differences. However you may have a case where the growth in TCP port count is gradually increasing. The gradual increase can be small enough where the difference between the two averages does not trigger a warning. To prevent the system from reaching a TCP exhaustion in such a a case, a limit can be set on the maximum number of ports an endpoint can have. When this maximum amount is set, the `ActorSystm` will be terminated when the port count exceeds this threshold. 
 
 The following is a graphical interpretation of how the system works when the there is an increase in the count, how each EWMA reacts to the change and how the percent difference grows due to this. In the values below, EMWA1 is our short sample EMWA and EWMA2 is our long sample EWMA. With CounterValue being the actual count we are seeing.
 
   ***EWMA Divergence Graph***
 <div style="text-align:center"><img src ="docs/images/EWMA-Graph.png" /></div>
 
-###Implementation
+### Implementation
 
 The project is intended to help detect and warn when an increase in TCP port count is expected for one or more network interfaces. The project will be implemented by the creation of a `TcpPortUseSupervisor` actor. This actor will be created using the `ActorSystem` that we want to monitor and terminate in case of a large increase in TCP port count. 
 
@@ -96,7 +96,7 @@ The project is intended to help detect and warn when an increase in TCP port cou
 ![](docs/images/Detection-WorkFlow.png)
 
 
-The `TcpPortUseSupervisor` actor will create a  TcpPortMonitoringActor which will scan all of the open TCP ports and group these by the local endpoint.  The count for each local endpoint will then be sent back to the `TcpPortUseSupervisor` actor. 
+The `TcpPortUseSupervisor` actor will create a  `TcpPortMonitoringActor` which will scan all of the open TCP ports and group these by the local endpoint.  The count for each local endpoint will then be sent back to the `TcpPortUseSupervisor` actor. 
 
 The `TcpPortUseSupevisor` actor will then take these readings and determine if the number of TCP ports exceeds our normal operating numbers(MinPorts). If the `MinPorts` number is exceeded, the actor will then signal the `SocketLeakDetectorActor` to begin monitoring the TCP ports for that particular endpoint. 
 
@@ -109,11 +109,11 @@ A `BreachDuration` period is set to allow the system to normalize in the event t
 <div style="text-align:center">The signal shutdown logic can be seen in the below diagram<img src ="docs/images/Message-Decision-Tree.png" /></div>
 
 
-###Configuration
+### Configuration
 
 You will only need to create the `TcpPortUseSupervisor` actor to be able to monitor the TCP port growth in your system. This actor comes with default settings and does not require you to pass any customized settings for it to be used. You can however, create your own `SocketLeakDetectorSettigns` to modify how responsive you want your system to be. The following are the configurable settings: 
 
-####SocketLeakDetectorSettings
+#### SocketLeakDetectorSettings
 
 **MaxPorts**: The maximum allowed TCP ports for a set endpoint. If a port count for a particular endpoint exceeds this number, we will signal for the `ActorSystem` to be shutdown if it does not fall below the `MaxPorts` count under the `BreachDuration` period. 
 
@@ -153,11 +153,11 @@ The faster the growth in TCP, the larger the difference you will see between the
 
 
 
-**IPAddress**: If you do not want to monitor all of the local endpoints, you can pass in a list of `IPAddress` as a parameter to you `TcpPortUseSupervisor` actor. When you pass in a list of `IPAddress`, these will be white-listed and all other `IPAddress` will be ignored for TCP port growth. When no list is `IPAddress` is passed as a parameter, all local endpoints will be monitored for TCP growth. 
+**IPAddress**: If you do not want to monitor all of the local endpoints, you can pass in a list of `IPAddress` as a parameter to you `TcpPortUseSupervisor` actor. When you pass in a list of `IPAddress`, these will be white-listed and all other `IPAddress` will be ignored for TCP port growth. When no list of `IPAddress` is passed as a parameter, all local endpoints will be monitored for TCP growth. 
 
 ***The default value*** for this parameter is to look for all the endpoints. If you do not wish to monitor all of the endpoints you can pass in a list with one or more `IPAddress` which you wish to monitor for this `ActorSystem`. 
 
-##Setting up the TcpPortUseSupervisor actors
+## Setting up the TcpPortUseSupervisor actors
 
 The following are three ways to setup your `TcpPortUseSupervisor`: 
 
@@ -182,9 +182,11 @@ SocketLeakDetectorSettings settings = new SocketLeakDetectorSettings
     ShortSampleSize = 80,
     BreachDuration = TimeSpan.FromSeconds(30),
     PortCheckInterval = TimeSpan.FromMilliseconds(500)
+
 };
 
 var supervisor = actorSystem.ActorOf(Props.Create(() => new TcpPortUseSupervisor(settings)), "tcpPorts");
+await actorSystem.WhenTerminated;
 ```
 
 ***Setting up your actor with only one white-listed address***
@@ -193,5 +195,6 @@ var supervisor = actorSystem.ActorOf(Props.Create(() => new TcpPortUseSupervisor
 var actorSystem = ActorSystem.Create("PortDetector", "akka.loglevel = DEBUG");
 List<IPAddress> iPList = new List<IPAddress> { IPAddress.Parse("127.0.0.1") };	               
 var supervisor = actorSystem.ActorOf(Props.Create(() => new TcpPortUseSupervisor(iPList)), "tcpPorts"); 
+await actorSystem.WhenTerminated;
 ```
 
