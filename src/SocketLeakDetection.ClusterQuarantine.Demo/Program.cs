@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -28,18 +29,44 @@ namespace SocketLeakDetection.ClusterQuarantine.Demo
     public class AssociationProfiler : ReceiveActor
     {
         private readonly ILoggingAdapter _log = Context.GetLogger();
+        private readonly Dictionary<Address, AssociatedEvent> _associations = new Dictionary<Address, AssociatedEvent>();
 
         public AssociationProfiler()
         {
             Receive<AssociatedEvent>(q =>
             {
                 // add entry to table - log it
-                
+                var duplicate = (!_associations.TryAdd(q.RemoteAddress, q));
+
+                if (q.IsInbound)
+                {
+                    _log.Info("We [{0}] associated {1} -> {2}", q.LocalAddress, q.RemoteAddress, q.LocalAddress);
+                    if (duplicate)
+                    {
+                        _log.Warning("Duplicate association [{0}] recorded {1} -> {2}", q.LocalAddress, q.RemoteAddress, q.LocalAddress);
+                    }
+                }
+                else
+                {
+                    _log.Info("We [{0}] associated {1} -> {2}", q.LocalAddress, q.LocalAddress, q.RemoteAddress);
+                    if (duplicate)
+                    {
+                        _log.Warning("Duplicate association [{0}] recorded {1} -> {2}", q.LocalAddress, q.LocalAddress, q.RemoteAddress);
+                    }
+                }
+                   
             });
 
             Receive<DisassociatedEvent>(q =>
             {
                 // remove matching entry from table - log it
+                var removedAssociation = _associations.Remove(q.RemoteAddress);
+                if (q.IsInbound)
+                    _log.Info("We [{0}] disassociated {1} -> {2}", q.LocalAddress, q.RemoteAddress, q.LocalAddress);
+                else
+                    _log.Info("We [{0}] disassociated {1} -> {2}", q.LocalAddress, q.LocalAddress, q.RemoteAddress);
+
+                _log.Info("Removed entry? {0} - Remaining associations: {1}", removedAssociation, _associations.Count);
             });
         }
 
@@ -103,6 +130,7 @@ namespace SocketLeakDetection.ClusterQuarantine.Demo
             var router = node.ActorOf(Props.Empty.WithRouter(FromConfig.Instance), "random");
             node.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2), router, "hit", ActorRefs.NoSender);
             var q = node.ActorOf(Props.Create(() => new QuarantineDetector()), "q");
+            var p = node.ActorOf(Props.Create(() => new AssociationProfiler()), "associations");
             return node;
         }
 
