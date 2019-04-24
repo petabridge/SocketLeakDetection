@@ -78,7 +78,7 @@ namespace SocketLeakDetection
             //}
 
             var portsPerAddress = ipProperties.GetActiveTcpConnections().GroupBy(x => x.LocalEndPoint.Address)
-                .Select(x => new TcpCount(x.Key, x.Count()));
+                .Select(x => new TcpCount(x.Key, x.Select(y => y.LocalEndPoint.Port).Distinct().Count()));
 
             foreach (var t in portsPerAddress)
                 _supervisor.Tell(t);

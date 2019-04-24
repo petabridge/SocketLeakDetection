@@ -182,12 +182,12 @@ namespace SocketLeakDetection
             {
                 _leakDetector.Next(count.CurrentPortCount);
 
-                if (_log.IsDebugEnabled)
-                {
-                    _log.Debug("Received port count of {0} for interface {1}", count.CurrentPortCount,
+                //if (_log.IsDebugEnabled)
+                //{
+                    _log.Info("Received port count of {0} for interface {1}", count.CurrentPortCount,
                         count.HostInterface);
-                    _log.Debug("Danger threshold: {0} - Observed threshold: {1}", _leakDetector.MaxDifference, _leakDetector.RelativeDifference);
-                }
+                    _log.Info("Danger threshold: {0} - Observed threshold: {1}", _leakDetector.MaxDifference, _leakDetector.RelativeDifference);
+                //}
                     
 
                 if (_leakDetector.ShouldFail && _breachSignal == null)
