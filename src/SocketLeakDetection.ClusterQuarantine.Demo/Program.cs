@@ -25,6 +25,32 @@ namespace SocketLeakDetection.ClusterQuarantine.Demo
         }
     }
 
+    public class AssociationProfiler : ReceiveActor
+    {
+        private readonly ILoggingAdapter _log = Context.GetLogger();
+
+        public AssociationProfiler()
+        {
+            Receive<AssociatedEvent>(q =>
+            {
+                // add entry to table - log it
+                
+            });
+
+            Receive<DisassociatedEvent>(q =>
+            {
+                // remove matching entry from table - log it
+            });
+        }
+
+
+        protected override void PreStart()
+        {
+            Context.System.EventStream.Subscribe(Self, typeof(AssociatedEvent));
+            Context.System.EventStream.Subscribe(Self, typeof(DisassociatedEvent));
+        }
+    }
+
     public class QuarantineDetector : ReceiveActor
     {
         private readonly ILoggingAdapter _log = Context.GetLogger();
