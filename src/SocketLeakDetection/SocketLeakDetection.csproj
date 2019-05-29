@@ -1,10 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\common.props" />
 
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Your description here.</Description>
+    <Description>Stand-alone Akka.NET package designed to help instrument detection of possible port exhaustion.</Description>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
   </PropertyGroup>
+
+
+
+  <ItemGroup>
+    <PackageReference Include="Akka" Version="$(AkkaVersion)" />
+  </ItemGroup>
 
 </Project>
